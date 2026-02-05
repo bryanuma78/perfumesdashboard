@@ -8,7 +8,28 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Referencia a Firestore y variables globales
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// ================= AUTH =================
+const auth = getAuth();
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  }
+});
+
+window.logout = () => {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+};
+
+// ================= FIRESTORE =================
 const productosRef = collection(db, "ropa");
 let editId = null;
 let productosCache = [];
@@ -70,7 +91,11 @@ window.guardarProducto = async () => {
       return;
     }
 
-    const data = { titulo, precio, descuento, genero, imagen, talla, color, material, stock, categoria, fecha: new Date() };
+    const data = { 
+      titulo, precio, descuento, genero, imagen, 
+      talla, color, material, stock, categoria, 
+      fecha: new Date() 
+    };
 
     if (editId) {
       await updateDoc(doc(db, "ropa", editId), data);
@@ -189,12 +214,10 @@ window.editarProducto = id => {
 
   editId = id;
 
-  // ✨ Desplazarse al formulario y enfocar el primer input
   const form = document.querySelector(".bg-white.shadow-xl.rounded-2xl.p-8");
   form.scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("titulo").focus();
 };
-
 
 // ================= HELPERS =================
 function limpiarFormulario() {

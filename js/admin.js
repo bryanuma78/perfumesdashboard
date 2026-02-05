@@ -9,6 +9,30 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// ================= AUTH =================
+const auth = getAuth();
+
+// Proteger el panel
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  }
+});
+
+// Logout
+window.logout = () => {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+};
+
+// ================= FIRESTORE =================
 const productosRef = collection(db, "productos");
 let editId = null;
 let productosCache = [];
@@ -156,7 +180,6 @@ window.editarProducto = id => {
 
   editId = id;
 
-  // ✨ Desplazarse al formulario y enfocar el primer input
   const form = document.querySelector(".bg-white.shadow-xl.rounded-2xl.p-8");
   form.scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("titulo").focus();
